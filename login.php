@@ -13,7 +13,7 @@ if(isset($_POST["submit"]))
 		$error = "Both fields are required.";
 	}else
 	{
-		// Define $username and $password
+		//// Define $username and $password
 		$username=$_POST['username'];
 		$password=$_POST['password'];
 
