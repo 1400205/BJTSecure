@@ -99,7 +99,7 @@ if(isset($_POST["submit"]))
 		//get a variable to count number of logins
 		$count=0;
 		$count=$count+1;
-		echo  $count;
+		//echo  $count;
 
 	}else
 	{
