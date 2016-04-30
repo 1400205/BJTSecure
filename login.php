@@ -1,58 +1,30 @@
-
 <?php
 session_start();
 ?>
 <?php
 include("connection.php"); //Establishing connection with our database
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-$error = ""; //Variable for storing our errors.
-if(isset($_POST["submit"]))
-{
-	if(empty($_POST["username"]) || empty($_POST["password"]))
-	{
-		$error = "Both fields are required.";
-	}else
-	{
-		//// Define $username and $password
-		$username=$_POST['username'];
-		$password=$_POST['password'];
-
-		//clean input photo user name
-		$username = stripslashes( $username );
-		$username=mysqli_real_escape_string($db,$username);
-		$username = htmlspecialchars($username);
-		$password=md5($password);
-
-
-
-		//implement prepared statement to take of sql injection and other vulnerabilities
-
-		//declare instance of connection
-		$sqlcon=new mysqli(DB_SERVER,DB_USERNAME,DB_PASSWORD,DB_DATABASE);
-		if (!($sqlcon->connect_errno)){
-			echo"connection Failed";
-		}
-
-		//prepare statement
-		if($stmt=$sqlcon->prepare("SELECT userID FROM usersSecure WHERE username=? and password=?")){
-			//bind parameter
-			$stmt->bind_param('ss',$username,$password);
-			$stmt->execute();
-			//get result
-			$result = $stmt->get_result();
-		}
-
-
-		if( ($row=$result->fetch_row()))
-		{
-			$_SESSION['username'] = $username; // Initializing Session
-			$_SESSION["userid"] = $userid;//user id assigned to session global variable
-			header("location: photos.php"); // Redirecting To Other Page
-		}else<?php
-session_start();
-?>
-<?php
-include("connection.php"); //Establishing connection with our database
+function get_client_ip() {
+	$ipaddress = '';
+	if (getenv('HTTP_CLIENT_IP'))
+		$ipaddress = getenv('HTTP_CLIENT_IP');
+	else if(getenv('HTTP_X_FORWARDED_FOR'))
+		$ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+	else if(getenv('HTTP_X_FORWARDED'))
+		$ipaddress = getenv('HTTP_X_FORWARDED');
+	else if(getenv('HTTP_FORWARDED_FOR'))
+		$ipaddress = getenv('HTTP_FORWARDED_FOR');
+	else if(getenv('HTTP_FORWARDED'))
+		$ipaddress = getenv('HTTP_FORWARDED');
+	else if(getenv('REMOTE_ADDR'))
+		$ipaddress = getenv('REMOTE_ADDR');
+	else
+		$ipaddress = 'UNKNOWN';
+	return $ipaddress;
+}
 
 //Function to cleanup user input for xss
 function xss_cleaner($input_str) {
@@ -110,6 +82,7 @@ if(isset($_POST["submit"]))
 
 		if (!$mysqli->query("CALL getUserID('$username','$password',@userID)")) {
 			//echo "CALL failed: (" . $mysqli->errno . ") " . $mysqli->error;
+
 		}
 
 
@@ -123,24 +96,23 @@ if(isset($_POST["submit"]))
 	if ($userid < 1)
 	{
 		echo  "Incorrect username or password.";
+		//get a variable to count number of logins
+		$count=0;
+		$count=$count+1;
+		echo  $count;
 
 	}else
 	{
+		//get session data
 		$_SESSION['username'] = $username; // Initializing Session
 		$_SESSION["userid"] = $userid;//user id assigned to session global variable
+		$_SESSION["ip"] = $_SERVER['REMOTE_ADDR'];
+		$_SESSION ["timeout"]=time();
 
 		header("location: photos.php"); // Redirecting To Other Page
 	}
 
 
-}
-
-?>
-		{
-			$error = "Incorrect username or password.";
-		}
-
-	}
 }
 
 ?>
